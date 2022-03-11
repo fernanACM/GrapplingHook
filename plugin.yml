@@ -1,0 +1,17 @@
+---
+name: GrapplingHook
+main: fernanACM\GrapplingHook\GrapplingHook
+version: 1.0.1
+api: 4.0.0
+authors: [fernanACM, korado531m7]
+description: The best hook to play Spider-Man, only in PocketMine-MP 4.0!. Updated by fernanACM
+website: https://github.com/fernanACM
+
+permissions:
+  grapplinghook:
+    default: op
+    description: 'Core GrapplingHook permission, grants access to all features.'
+  grapplinghook.acm:
+    default: op
+    description: 'Allows players to use the grappling hook and cancels fall damage while holding the item.'
+...
