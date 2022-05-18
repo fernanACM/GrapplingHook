@@ -5,6 +5,7 @@ branches:
 projects:
   GrapplingHook:
     path: ""
+    icon: icon-grapplinghook.png
     lint:
       phpstan: false
 ...
