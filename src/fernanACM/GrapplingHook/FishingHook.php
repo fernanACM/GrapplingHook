@@ -1,38 +1,39 @@
 <?php
-// thank you very much for helping JackNoordhuis
 
+#      _       ____   __  __ 
+#     / \     / ___| |  \/  |
+#    / _ \   | |     | |\/| |
+#   / ___ \  | |___  | |  | |
+#  /_/   \_\  \____| |_|  |_|
+# The creator of this plugin was fernanACM.
+# https://github.com/fernanACM
+    
 namespace fernanACM\GrapplingHook;
 
+use pocketmine\player\Player;
+
+use pocketmine\utils\Random;
+
 use pocketmine\block\Block;
+
 use pocketmine\entity\Entity;
-use pocketmine\entity\EntitySizeInfo;
 use pocketmine\entity\Location;
 use pocketmine\entity\projectile\Projectile;
 use pocketmine\entity\projectile\Throwable;
+
 use pocketmine\math\RayTraceResult;
+
 use pocketmine\nbt\tag\CompoundTag;
+
 use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
-use pocketmine\player\Player;
-use pocketmine\utils\Random;
 
-class FishingHook extends Throwable {
-	public static function getNetworkTypeId() : string { return EntityIds::FISHING_HOOK; }
+class FishingHook extends Throwable{
 
-	protected $gravity = 0.1;
+	/** @var float $gravity */
+	protected float $gravity = 0.1;
 
-	private const MOTION_SEED = 0.007499999832361937;
-
-	public function getResultDamage() : int {
-		return 1;
-	}
-
-	protected function onHitBlock(Block $blockHit, RayTraceResult $hitResult) : void {
-		Projectile::onHitBlock($blockHit, $hitResult);
-	}
-
-	public function __construct(Location $pos, Entity $owner, ?CompoundTag $nbt = null) {
+	public function __construct(Location $pos, ?Entity $owner, ?CompoundTag $nbt = null){
 		parent::__construct($pos, $owner, $nbt);
-
 		if($owner instanceof Player) {
 			$this->setPosition($this->location->add(0, $owner->getEyeHeight() - 0.1, 0));
 			$this->setMotion($owner->getDirectionVector()->multiply(0.4));
@@ -41,7 +42,36 @@ class FishingHook extends Throwable {
 		}
 	}
 
-	public function handleHookCasting(float $x, float $y, float $z, float $f1, float $f2) : void {
+	/**
+	 * @return string
+	 */
+	public static function getNetworkTypeId(): string { return EntityIds::FISHING_HOOK; }
+
+	/**
+	 * @return integer
+	 */
+	public function getResultDamage(): int{
+		return 1;
+	}
+
+	/**
+	 * @param Block $blockHit
+	 * @param RayTraceResult $hitResult
+	 * @return void
+	 */
+	protected function onHitBlock(Block $blockHit, RayTraceResult $hitResult): void{
+		Projectile::onHitBlock($blockHit, $hitResult);
+	}
+
+	/**
+	 * @param float $x
+	 * @param float $y
+	 * @param float $z
+	 * @param float $f1
+	 * @param float $f2
+	 * @return void
+	 */
+	public function handleHookCasting(float $x, float $y, float $z, float $f1, float $f2): void{
 		$rand = new Random();
 		$f = sqrt($x * $x + $y * $y + $z * $z);
 		$x = $x / (float)$f;
@@ -58,34 +88,48 @@ class FishingHook extends Throwable {
 		$this->motion->z += $z;
 	}
 
-	public function onHitEntity(Entity $entityHit, RayTraceResult $hitResult) : void {
+	/**
+	 * @param Entity $entityHit
+	 * @param RayTraceResult $hitResult
+	 * @return void
+	 */
+	public function onHitEntity(Entity $entityHit, RayTraceResult $hitResult): void {
 		//Do nothing
 	}
 
-	public function entityBaseTick(int $tickDiff = 1) : bool {
+	/**
+	 * @param integer $tickDiff
+	 * @return boolean
+	 */
+	public function entityBaseTick(int $tickDiff = 1): bool{
 		$hasUpdate = parent::entityBaseTick($tickDiff);
 		$owner = $this->getOwningEntity();
-		if($owner instanceof Player) {
-			if(!$owner->getInventory()->getItemInHand() instanceof FishingRod or !$owner->isAlive() or $owner->isClosed()) {
+		if($owner instanceof Player){
+			$item = FishingRod::giveGrapplingHook($owner);
+			if(!$owner->getInventory()->getItemInHand()->equals($item) or !$owner->isAlive() or $owner->isClosed()) {
 				$this->flagForDespawn();
 			}
-		} else {
+		}else{
 			$this->flagForDespawn();
 		}
-
 		return $hasUpdate;
 	}
 
-	public function onDispose() : void {
+	/**
+	 * @return void
+	 */
+	public function onDispose(): void{
 		parent::onDispose();
-
 		$owner = $this->getOwningEntity();
 		if($owner instanceof Player) {
 			GrapplingHook::setFishingHook(null, $owner);
 		}
 	}
 
-	public function handleHookRetraction() : void {
+	/**
+	 * @return void
+	 */
+	public function handleHookRetraction(): void{
 		$owner = $this->getOwningEntity();
 		$ownerPos = $owner->getPosition();
 		$dist = $this->location->distanceSquared($ownerPos);
@@ -93,7 +137,11 @@ class FishingHook extends Throwable {
 		$this->flagForDespawn();
 	}
 
-	private function getGrapplingSpeed(float $dist) : float {
+	/**
+	 * @param float $dist
+	 * @return float
+	 */
+	private function getGrapplingSpeed(float $dist): float{
 		if($dist > 600):
 			$motion = 0.26;
 		elseif($dist > 500):
@@ -113,7 +161,11 @@ class FishingHook extends Throwable {
 		return $motion;
 	}
 
-	public function onUpdate(int $currentTick) : bool {
+	/**
+	 * @param integer $currentTick
+	 * @return boolean
+	 */
+	public function onUpdate(int $currentTick): bool{
 		if($this->closed){
 			return false;
 		}
@@ -124,5 +176,4 @@ class FishingHook extends Throwable {
 
 		return parent::onUpdate($currentTick);
 	}
-
 }
