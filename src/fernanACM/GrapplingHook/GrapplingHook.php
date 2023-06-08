@@ -32,14 +32,12 @@ use muqsit\simplepackethandler\SimplePacketHandler;
 
 use DaPigGuy\libPiggyUpdateChecker\libPiggyUpdateChecker;
 
-use poggit\libasynql\libasynql;
-
 use CortexPE\Commando\PacketHooker;
 use CortexPE\Commando\BaseCommand;
 # My files
 use fernanACM\GrapplingHook\commands\GrapplingHookCommand;
 
-use fernanACM\GrapplingHook\provider\libasynqlProvider;
+use fernanACM\GrapplingHook\provider\ProviderDataStorage;
 use fernanACM\GrapplingHook\utils\CooldownUtils;
 use fernanACM\GrapplingHook\utils\PluginUtils;
 
@@ -53,8 +51,8 @@ class GrapplingHook extends PluginBase{
     /** @var GrapplingHook $instance */
     private static GrapplingHook $instance;
 
-    /** @var libasynqlProvider $provider */
-    private libasynqlProvider $provider;
+    /** @var ProviderDataStorage $provider */
+    private ProviderDataStorage $provider;
 
     /** @var array $fishing */
 	private static array $fishing = [];
@@ -79,22 +77,21 @@ class GrapplingHook extends PluginBase{
         $this->loadEvents();
         $this->loadCommands();
         $this->loadEntitites();
-        CooldownUtils::loadCooldownsFromDatabase();
+        CooldownUtils::loadCooldownsFromFile();
     }
 
     /**
      * @return void
      */
     public function onDisable(): void{
-        CooldownUtils::saveCooldownsToDatabase();
-        $this->getProvider()->unloadDatabase();
+        CooldownUtils::saveCooldownsToFile();
     }
 
     /**
      * @return void
      */
     public function loadFiles(): void{
-        @mkdir($this->getDataFolder(). "database");
+        @mkdir($this->getDataFolder(). "data");
         $this->saveResource("config.yml");
 	    $this->config = new Config($this->getDataFolder() . "config.yml");
     }
@@ -117,7 +114,6 @@ class GrapplingHook extends PluginBase{
      */
     public function loadVirions(): void{
         foreach([
-            "libasynql" => libasynql::class,
             "SimplePacketHandler" => SimplePacketHandler::class,
             "Commando" => BaseCommand::class,
             "libPiggyUpdateChecker" => libPiggyUpdateChecker::class
@@ -133,7 +129,7 @@ class GrapplingHook extends PluginBase{
             PacketHooker::register($this);
         }
         # Database
-        $this->getProvider()->loadDatabase();
+        $this->getProvider()->loadPlayerData();
         # Update
         libPiggyUpdateChecker::init($this);
     }
@@ -156,7 +152,7 @@ class GrapplingHook extends PluginBase{
      */
     private function loadVars(): void{
         self::$instance = $this;
-        $this->provider = new libasynqlProvider();
+        $this->provider = new ProviderDataStorage();
     }
 
     /**
@@ -191,9 +187,9 @@ class GrapplingHook extends PluginBase{
     }
 
     /**
-     * @return libasynqlProvider
+     * @return ProviderDataStorage
      */
-    public function getProvider(): libasynqlProvider{
+    public function getProvider(): ProviderDataStorage{
         return $this->provider;
     }
 
