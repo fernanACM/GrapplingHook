@@ -11,7 +11,7 @@
 
 ### 💡 Implementations
 * [X] Configuration
-* [X] Database
+* [X] Storage data provider
 * [X] Cooldown
 
 ### 💾 Config
@@ -31,26 +31,12 @@ config-version: "1.0.0"
 # Prefix plugin
 Prefix: "&l&f[&bGrapplingHook&f]&8»&r "
 
-# DATABASE
-database:
-  # The database type. "sqlite" and "mysql" are supported.
-  type: sqlite
-
-  # Edit these settings only if you choose "sqlite".
-  sqlite:
-    # The file name of the database in the plugin data folder.
-    # You can also put an absolute path here.
-    file: database/GrapplingHook.db
-  # Edit these settings only if you choose "mysql".
-  mysql:
-    host: 127.0.0.1
-    # Avoid using the "root" user for security reasons.
-    username: root
-    password: ""
-    schema: your_schema
-  # The maximum number of simultaneous SQL queries
-  # Recommended: 1 for sqlite, 2 for MySQL. You may want to further increase this value if your MySQL connection is very slow.
-  worker-limit: 1
+# Provider data storage
+# types available:
+# "json"
+# "yaml" or "yml"
+Provider:
+  data-storage: "json"
 
 # Item from GrapplingHook
 GrapplingHook:
@@ -107,6 +93,5 @@ Messages:
 |---------|--------|-----|
 | CortexPE | [CortexPE](https://github.com/CortexPE) | [Commando](https://github.com/CortexPE/Commando/tree/master/) |
 | Muqsit | [Muqsit](https://github.com/Muqsit) | [SimplePacketHandler](https://github.com/Muqsit/SimplePacketHandler) |
-| Poggit | [Poggit](https://github.com/poggit) | [libasynql](https://github.com/poggit/libasynql/tree/pm5) |
 | DaPigGuy | [DaPigGuy](https://github.com/DaPigGuy) | [libPiggyUpdateChecker](https://github.com/DaPigGuy/libPiggyUpdateChecker) |
 | [JackNoordhuis](https://github.com/JackNoordhuis) | Thank you for helping me update it to PM4 | |
