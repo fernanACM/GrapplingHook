@@ -11,7 +11,6 @@
 
 ### 💡 Implementations
 * [X] Configuration
-* [X] Storage data provider
 * [X] Cooldown
 
 ### 💾 Config
@@ -30,13 +29,6 @@ config-version: "1.0.0"
 
 # Prefix plugin
 Prefix: "&l&f[&bGrapplingHook&f]&8»&r "
-
-# Provider data storage
-# types available:
-# "json"
-# "yaml" or "yml"
-Provider:
-  data-storage: "json"
 
 # Item from GrapplingHook
 GrapplingHook:
