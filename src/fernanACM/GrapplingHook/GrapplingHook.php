@@ -37,8 +37,6 @@ use CortexPE\Commando\BaseCommand;
 # My files
 use fernanACM\GrapplingHook\commands\GrapplingHookCommand;
 
-use fernanACM\GrapplingHook\provider\ProviderDataStorage;
-use fernanACM\GrapplingHook\utils\CooldownUtils;
 use fernanACM\GrapplingHook\utils\PluginUtils;
 
 use fernanACM\GrapplingHook\Event;
@@ -50,9 +48,6 @@ class GrapplingHook extends PluginBase{
 
     /** @var GrapplingHook $instance */
     private static GrapplingHook $instance;
-
-    /** @var ProviderDataStorage $provider */
-    private ProviderDataStorage $provider;
 
     /** @var array $fishing */
 	private static array $fishing = [];
@@ -77,21 +72,12 @@ class GrapplingHook extends PluginBase{
         $this->loadEvents();
         $this->loadCommands();
         $this->loadEntitites();
-        CooldownUtils::loadCooldownsFromFile();
-    }
-
-    /**
-     * @return void
-     */
-    public function onDisable(): void{
-        CooldownUtils::saveCooldownsToFile();
     }
 
     /**
      * @return void
      */
     public function loadFiles(): void{
-        @mkdir($this->getDataFolder(). "data");
         $this->saveResource("config.yml");
 	    $this->config = new Config($this->getDataFolder() . "config.yml");
     }
@@ -128,8 +114,6 @@ class GrapplingHook extends PluginBase{
         if(!PacketHooker::isRegistered()){
             PacketHooker::register($this);
         }
-        # Database
-        $this->getProvider()->loadPlayerData();
         # Update
         libPiggyUpdateChecker::init($this);
     }
@@ -141,6 +125,9 @@ class GrapplingHook extends PluginBase{
         Server::getInstance()->getCommandMap()->register("grapplinghook", new GrapplingHookCommand);
     }
 
+    /**
+     * @return void
+     */
     public function loadEntitites(): void{
         EntityFactory::getInstance()->register(FishingHook::class, function(World $world, CompoundTag $nbt): FishingHook{
             return new FishingHook(EntityDataHelper::parseLocation($nbt, $world), null, $nbt);
@@ -152,7 +139,6 @@ class GrapplingHook extends PluginBase{
      */
     private function loadVars(): void{
         self::$instance = $this;
-        $this->provider = new ProviderDataStorage();
     }
 
     /**
@@ -184,13 +170,6 @@ class GrapplingHook extends PluginBase{
      */
     public static function getInstance(): GrapplingHook{
         return self::$instance;
-    }
-
-    /**
-     * @return ProviderDataStorage
-     */
-    public function getProvider(): ProviderDataStorage{
-        return $this->provider;
     }
 
     /**

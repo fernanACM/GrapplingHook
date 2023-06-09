@@ -64,15 +64,13 @@ class Event implements Listener{
 			return;
 		}
 
-        if(CooldownUtils::hasCooldown($player, self::COOLDOWN_ID)){
-            $cooldown = CooldownUtils::getRemainingTime($player, self::COOLDOWN_ID);
-            $message = str_replace(["{COOLDOWN}"], [$cooldown], GrapplingHook::getMessage($player, "Messages.you-have-cooldown"));
-            $player->sendActionBarMessage($message);
-            return;
-        }
-
         $item = $player->getInventory()->getItemInHand();
         if(!is_null($item->getNamedTag()->getTag(self::COOLDOWN_ID))){
+            if(CooldownUtils::hasCooldown($player, self::COOLDOWN_ID)){
+                $cooldown = CooldownUtils::getRemainingTime($player, self::COOLDOWN_ID);
+                $message = str_replace(["{COOLDOWN}"], [$cooldown], GrapplingHook::getMessage($player, "Messages.you-have-cooldown"));
+                $player->sendActionBarMessage($message);
+            }
             if(is_null(GrapplingHook::getFishingHook($player))){
                 $hook = new FishingHook(Location::fromObject(
                     $player->getEyePos(),

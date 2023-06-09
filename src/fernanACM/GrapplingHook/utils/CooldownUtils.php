@@ -16,7 +16,7 @@ use pocketmine\player\Player;
 
 use fernanACM\GrapplingHook\GrapplingHook as Loader;
 
-class CooldownUtils{
+class CooldownUtils {
 
     /** @var array<string, array{timestamp: int, duration: int}> */
     private static $cooldowns = [];
@@ -31,7 +31,6 @@ class CooldownUtils{
             "timestamp" => time(),
             "duration" => $duration
         ];
-        self::saveCooldownsToFile();
     }
 
     /**
@@ -42,7 +41,6 @@ class CooldownUtils{
         unset(self::$cooldowns[$player->getName()][$id]);
         if(empty(self::$cooldowns[$player->getName()])){
             unset(self::$cooldowns[$player->getName()]);
-            self::saveCooldownsToFile();
         }
     }
 
@@ -61,7 +59,7 @@ class CooldownUtils{
      * @return string|null
      */
     public static function getRemainingTime(Player $player, string $id): ?string{
-        $config = Loader::getInstance()->getConfig();
+        $config = Loader::getInstance()->config;
     
         if(!self::hasCooldown($player, $id)){
             return null;
@@ -71,7 +69,7 @@ class CooldownUtils{
         $cooldownEnd = $cooldownData["timestamp"] + $cooldownData["duration"];
     
         $secondsLeft = $cooldownEnd - time();
-        if($secondsLeft <= 0){
+        if ($secondsLeft <= 0) {
             self::removeCooldown($player, $id);
             return null;
         }
@@ -120,7 +118,6 @@ class CooldownUtils{
             "timestamp" => time(),
             "duration" => 0
        ];
-       self::saveCooldownsToFile();
     }
 
     /**
@@ -131,23 +128,6 @@ class CooldownUtils{
     public static function cancelCooldown(Player $player, string $id): void{
         if(self::hasCooldown($player, $id)){
             self::removeCooldown($player, $id);
-        }
-    }
-
-    /**
-     * @return void
-     */
-    public static function saveCooldownsToFile(): void{
-        Loader::getInstance()->getProvider()->saveDataToFile(self::$cooldowns);
-    }
-
-    /**
-     * @return void
-     */
-    public static function loadCooldownsFromFile(): void{
-        $cooldownData = Loader::getInstance()->getProvider()->loadDataToFile();
-        if(is_array($cooldownData)){
-            self::$cooldowns = $cooldownData;
         }
     }
 }
