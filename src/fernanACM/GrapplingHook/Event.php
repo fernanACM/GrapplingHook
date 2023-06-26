@@ -58,14 +58,13 @@ class Event implements Listener{
         $location = $player->getLocation();
 		$world = $player->getWorld();
 
-        if(!$player->hasPermission('grapplinghook.acm')){
-            $player->sendMessage(GrapplingHook::Prefix(). GrapplingHook::getMessage($player, "Messages.no-permission"));
-            PluginUtils::PlaySound($player, "mob.villager.no", 1, 1);
-			return;
-		}
-
         $item = $player->getInventory()->getItemInHand();
         if(!is_null($item->getNamedTag()->getTag(self::COOLDOWN_ID))){
+            if(!$player->hasPermission('grapplinghook.acm')){
+                $player->sendMessage(GrapplingHook::Prefix(). GrapplingHook::getMessage($player, "Messages.no-permission"));
+                PluginUtils::PlaySound($player, "mob.villager.no", 1, 1);
+                return;
+            }
             if(CooldownUtils::hasCooldown($player, self::COOLDOWN_ID)){
                 $cooldown = CooldownUtils::getRemainingTime($player, self::COOLDOWN_ID);
                 $message = str_replace(["{COOLDOWN}"], [$cooldown], GrapplingHook::getMessage($player, "Messages.you-have-cooldown"));
