@@ -1,7 +1,7 @@
 ---
 name: GrapplingHook
 main: fernanACM\GrapplingHook\GrapplingHook
-version: 2.0.0
+version: 2.0.1
 api: 5.0.0
 authors: [fernanACM, korado531m7]
 description: The best hook to play Spider-Man, only in PocketMine-MP 5.0!. Updated by fernanACM
